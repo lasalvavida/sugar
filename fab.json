@@ -1,0 +1,34 @@
+{
+	"lib": [{
+		"name": "sugar",
+		"sources": [{
+			"dir": "src",
+			"recursive": true
+		}],
+		"include": [
+			"include"
+		],
+		"export": {
+			"include": [
+				"include"
+			]
+		}
+	}],
+	"bin": [{
+		"name": "sugar-test",
+		"sources": [{
+			"dir": "test/src",
+			"recursive": true
+		}],
+		"include": [
+			"test/include"
+		],
+		"depends": [
+			"sugar",
+			"sentinel"
+		]
+	}],
+	"external": [{
+		"git": "https://github.com/lasalvavida/sentinel.git"
+	}]
+}
