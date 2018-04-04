@@ -9,7 +9,9 @@
 namespace sugar {
 	class Block : public sugar::Generic {
 	public:
-		Block() : sugar::Generic(sugar::Generic::Type::BLOCK) {};
 		std::vector<Generic*> contents;
+
+		Block() : sugar::Generic(sugar::Generic::Type::BLOCK) {};
+		std::vector<std::string> getIncludes();
 	};
 }

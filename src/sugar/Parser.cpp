@@ -1,6 +1,7 @@
 #include <sugar/Parser.h>
 
 #include <sugar/Block.h>
+#include <sugar/Include.h>
 #include <sugar/Instruction.h>
 
 #include <iostream>
@@ -15,13 +16,46 @@ Block* parseBlock(string content, size_t offset, size_t* end) {
 	bool inChar = false;
 	bool inLineComment = false;
 	bool inBlockComment = false;
+	bool inMacro = false;
+	size_t macroStart = true;
+	bool inIncludeMacro = false;
+	bool includeStarted = false;
+	size_t includeStart;
 	bool inInstruction = false;
 	size_t instructionStart;
 
 	char lastChar = '\0';
 	for (size_t i = offset; i < content.length(); i++) {
 		char c = content.at(i);
-		if (inBlockComment) {
+		if (inMacro) {
+			if (inIncludeMacro) {
+				if (includeStarted) {
+					if (c == '"' || c == '>') {
+						block->contents.push_back(
+							new Include(
+								content.substr(includeStart,
+									i - includeStart)));
+					}
+				} else {
+					if (c == '"' || c == '<') {
+						includeStarted = true;
+						includeStart = i + 1;
+					}
+				}
+			} else {
+				if (c == ' ') {
+					if (macroStart < i) {
+						string command = content.substr(macroStart, i - macroStart);
+						if (command == "include") {
+							inIncludeMacro = true;
+							includeStarted = false;
+						}
+					} else {
+						macroStart = i + 1;
+					}
+				}
+			}
+		} else if (inBlockComment) {
 			if (lastChar == '*' && c == '/') {
 				inBlockComment = false;
 			}
@@ -40,6 +74,9 @@ Block* parseBlock(string content, size_t offset, size_t* end) {
 		} else {
 			if (c == ' ' || c == '\n' || c == '\r') {
 				continue;
+			} else if (c == '#') {
+				inMacro = true;
+				macroStart = i + 1;
 			} else if (lastChar == '/' && c == '*') {
 				inBlockComment = true;
 				inInstruction = false;

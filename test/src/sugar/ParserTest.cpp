@@ -1,5 +1,7 @@
 #include <sugar/ParserTest.h>
 
+#include <sugar/Include.h>
+
 using namespace std;
 using namespace sugar;
 using namespace lithic::sentinel;
@@ -225,5 +227,19 @@ ParserTest::ParserTest() : UnitTest() {
 		expect->toEqual(item->type, Generic::Type::INSTRUCTION);
 		Instruction* instruction = (Instruction*)item;
 		expect->toEqual(instruction->body, code);
+	});
+
+	test("parseIncludeMacro", [=]() {
+		string code = "#include <stdio>\n";
+
+		Parser* parser = new Parser();
+		Block* block = parser->parse(code);
+		expect->notToBeNull(block);
+
+		vector<string> includes = block->getIncludes();
+		int includesSize = includes.size();
+		expect->toEqual(includesSize, 1);
+
+		expect->toEqual(includes[0], string("stdio"));
 	});
 }

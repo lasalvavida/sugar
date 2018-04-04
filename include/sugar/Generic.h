@@ -5,7 +5,8 @@ namespace sugar {
 	public:
 		enum Type {
 			BLOCK,
-			INSTRUCTION
+			INSTRUCTION,
+			INCLUDE
 		};
 
 		Type type;
